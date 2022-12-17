@@ -21,14 +21,14 @@ class CounterPage extends View<CounterPageViewModel> {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           Text(viewModel.text, style: TextStyle(fontSize: 64, color: listenTo<ColorService>().color)),
         ])),
-        floatingActionButton: IncrementButton());
+        floatingActionButton: IncrementButton(incrementLowercase: viewModel.incrementLowercase));
   }
 }
 
 class CounterPageViewModel extends ViewModel {
   int numberCount = 0;
-  late final lowercaseCount = ValueNotifier<String>('a')..addListener(buildView);
-  late final uppercaseCount = Property<String>('A')..addListener(buildView);
+  late final uppercaseCount = ValueNotifier<String>('A')..addListener(buildView);
+  late final lowercaseCount = Property<String>('a')..addListener(buildView);
   // late final uppercaseCount = createProperty('A');
 
   void incrementNumber() {
@@ -46,7 +46,8 @@ class CounterPageViewModel extends ViewModel {
 }
 
 class IncrementButton extends View<IncrementButtonViewModel> {
-  IncrementButton({super.key}) : super(builder: () => IncrementButtonViewModel());
+  IncrementButton({required VoidCallback incrementLowercase, super.key})
+      : super(builder: () => IncrementButtonViewModel(incrementLowercase: incrementLowercase));
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +59,15 @@ class IncrementButton extends View<IncrementButtonViewModel> {
 }
 
 class IncrementButtonViewModel extends ViewModel {
+  IncrementButtonViewModel({required this.incrementLowercase});
+  final VoidCallback incrementLowercase;
   late final index = createProperty<int>(0);
   String get buttonText => <String>['+1', '+A', '+a'][index.value];
   void incrementCounter() {
-    <void Function()>[
+    <VoidCallback>[
       get<CounterPageViewModel>().incrementNumber,
       get<CounterPageViewModel>().incrementUppercase,
-      get<CounterPageViewModel>().incrementLowercase,
+      incrementLowercase,
     ][index.value]();
     index.value = index.value == 2 ? 0 : index.value + 1;
   }
@@ -78,9 +81,9 @@ class ColorService extends Model {
     });
   }
 
-  int _counter = 0;
-  Color color = Colors.orange;
   late Timer _timer;
+  Color color = Colors.orange;
+  int _counter = 0;
 
   @override
   void dispose() {
