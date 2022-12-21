@@ -24,15 +24,18 @@ void main() {
     await tester.pumpWidget(testApp());
 
     expect(find.text('a0'), findsOneWidget);
+    expect(find.text('+a'), findsOneWidget);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pump();
 
     expect(find.text('b0'), findsOneWidget);
+    expect(find.text('+1'), findsOneWidget);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pump();
 
     expect(find.text('b1'), findsOneWidget);
+    expect(find.text('+a'), findsOneWidget);
   });
 }
