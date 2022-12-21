@@ -20,30 +20,44 @@ class CounterPage extends View<CounterPageViewModel> {
     return Scaffold(
         body: Center(
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          Text(viewModel.letterCount.value,
-              style: TextStyle(fontSize: 64, color: listenTo<ColorService>().color.value)),
-          Text(viewModel.numberCount.toString(),
-              style: TextStyle(fontSize: 64, color: listenTo<ColorService>().color.value)),
+          Text(
+            viewModel.text,
+            style: TextStyle(
+              fontSize: 64,
+              color: listenTo<ColorService>().color.value,
+            ),
+          ),
         ])),
-        floatingActionButton: IncrementButton());
+        floatingActionButton: IncrementButton(
+          onIncrementLetter: viewModel.incrementLetter,
+          onIncrementNumber: viewModel.incrementNumber,
+        ));
   }
 }
 
 class CounterPageViewModel extends ViewModel {
-  int numberCount = 0;
-  late final letterCount = ValueNotifier<String>('a')..addListener(buildView);
+  // late final letterCount = ValueNotifier<String>('a')..addListener(buildView);
+  late final letterCount = createProperty<String>('a');
+  late final numberCount = createProperty<int>(0);
 
-  void incrementNumber() {
-    numberCount = numberCount == 25 ? 0 : numberCount + 1;
-    buildView();
-  }
+  void incrementNumber() => numberCount.value = numberCount.value == 25 ? 0 : numberCount.value + 1;
 
   void incrementLetter() =>
       letterCount.value = letterCount.value == 'z' ? 'a' : String.fromCharCode(letterCount.value.codeUnits[0] + 1);
+
+  String get text => letterCount.value + numberCount.value.toString();
 }
 
 class IncrementButton extends View<IncrementButtonViewModel> {
-  IncrementButton({super.key}) : super(builder: () => IncrementButtonViewModel());
+  IncrementButton({
+    required VoidCallback onIncrementLetter,
+    required VoidCallback onIncrementNumber,
+    super.key,
+  }) : super(
+            builder: () => IncrementButtonViewModel(
+                  onIncrementLetter: onIncrementLetter,
+                  onIncrementNumber: onIncrementNumber,
+                ));
 
   @override
   Widget build(BuildContext context) {
@@ -55,17 +69,26 @@ class IncrementButton extends View<IncrementButtonViewModel> {
 }
 
 class IncrementButtonViewModel extends ViewModel {
+  IncrementButtonViewModel({
+    required this.onIncrementLetter,
+    required this.onIncrementNumber,
+  });
+
+  final VoidCallback onIncrementNumber;
+  final VoidCallback onIncrementLetter;
+
   late final isNumber = createProperty<bool>(false);
   String get buttonText => isNumber.value ? '+1' : '+a';
+
   void incrementCounter() {
-    isNumber.value ? get<CounterPageViewModel>().incrementNumber() : get<CounterPageViewModel>().incrementLetter();
+    isNumber.value ? onIncrementNumber() : onIncrementLetter();
     isNumber.value = !isNumber.value;
   }
 }
 
 class ColorService extends Model {
   ColorService() {
-    _timer = Timer.periodic(const Duration(milliseconds: 1500), (_) {
+    _timer = Timer.periodic(const Duration(milliseconds: 3500), (_) {
       color.value = <Color>[Colors.red, Colors.black, Colors.blue, Colors.orange][++_counter % 4];
     });
   }
