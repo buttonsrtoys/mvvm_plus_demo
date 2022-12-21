@@ -8,6 +8,7 @@
 import 'package:bilocator/bilocator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gen_expects/gen_expects.dart';
 
 import 'package:mvvm_plus_demo/main.dart';
 
@@ -22,19 +23,16 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(testApp());
 
-    expect(find.text('a'), findsOneWidget);
-    expect(find.text('0'), findsOneWidget);
+    expect(find.text('a0'), findsOneWidget);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pump();
 
-    expect(find.text('b'), findsOneWidget);
-    expect(find.text('0'), findsOneWidget);
+    expect(find.text('b0'), findsOneWidget);
 
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pump();
 
-    expect(find.text('b'), findsOneWidget);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('b1'), findsOneWidget);
   });
 }

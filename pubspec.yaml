@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   mvvm_plus: ^1.0.3
   bilocator: ^0.5.2
+  gen_expects: ^0.1.5
 
 dev_dependencies:
   flutter_test:
