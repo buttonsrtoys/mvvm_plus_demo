@@ -88,7 +88,7 @@ class IncrementButtonViewModel extends ViewModel {
 
 class ColorService extends Model {
   ColorService() {
-    _timer = Timer.periodic(const Duration(milliseconds: 3500), (_) {
+    _timer = Timer.periodic(const Duration(milliseconds: 1500), (_) {
       color.value = <Color>[Colors.red, Colors.black, Colors.blue, Colors.orange][++_counter % 4];
     });
   }
