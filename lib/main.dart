@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:mvvm_plus/mvvm_plus.dart';
 import 'package:bilocator/bilocator.dart';
@@ -7,11 +6,10 @@ import 'package:bilocator/bilocator.dart';
 void main() => runApp(myApp());
 
 Widget myApp() => Bilocator<ColorService>(
-    builder: () => ColorService(milliSeconds: 1500),
+    builder: () => ColorService(),
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Bilocator<ColorService>(
-          builder: () => ColorService(milliSeconds: 2250), location: Location.tree, child: CounterPage()),
+      home: CounterPage(),
     ));
 
 class CounterPage extends View<CounterPageViewModel> {
@@ -23,11 +21,9 @@ class CounterPage extends View<CounterPageViewModel> {
         body: Center(
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           Text(viewModel.letterCount.value,
-              style: TextStyle(
-                fontSize: 64,
-                color: listenTo<ColorService>(context: context).color,
-              )),
-          Text(viewModel.numberCount.toString(), style: TextStyle(fontSize: 64, color: listenTo<ColorService>().color)),
+              style: TextStyle(fontSize: 64, color: listenTo<ColorService>().color.value)),
+          Text(viewModel.numberCount.toString(),
+              style: TextStyle(fontSize: 64, color: listenTo<ColorService>().color.value)),
         ])),
         floatingActionButton: IncrementButton());
   }
@@ -38,7 +34,7 @@ class CounterPageViewModel extends ViewModel {
   late final letterCount = ValueNotifier<String>('a')..addListener(buildView);
 
   void incrementNumber() {
-    numberCount = numberCount == 9 ? 0 : numberCount + 1;
+    numberCount = numberCount == 25 ? 0 : numberCount + 1;
     buildView();
   }
 
@@ -68,15 +64,14 @@ class IncrementButtonViewModel extends ViewModel {
 }
 
 class ColorService extends Model {
-  ColorService({required int milliSeconds}) {
-    _timer = Timer.periodic(Duration(milliseconds: milliSeconds), (_) {
-      color = <Color>[Colors.red, Colors.black, Colors.blue, Colors.orange][++_counter % 4];
-      notifyListeners();
+  ColorService() {
+    _timer = Timer.periodic(const Duration(milliseconds: 1500), (_) {
+      color.value = <Color>[Colors.red, Colors.black, Colors.blue, Colors.orange][++_counter % 4];
     });
   }
 
   int _counter = 0;
-  Color color = Colors.orange;
+  late final color = createProperty<Color>(Colors.orange);
   late Timer _timer;
 
   @override
